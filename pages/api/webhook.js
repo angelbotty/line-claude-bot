@@ -63,40 +63,24 @@ Q:研究中什麼時候才能用/什麼時候推出? A:目前還在內部測試�
 【無法回答時】引導聯絡：contact-hsc@mingyifoundation.org
 【絕對不做】醫療診斷、保證療效`;
 
-const TESTS = [
-  "我對牛奶跟花生過敏，可以用嗎？",
-  "我可以許願嗎？",
-  "你們可以開發幫助食物過敏的版本嗎？",
-  "在研究中的功能什麼時候可以給我們用？"
-];
-
 export default async function handler(req, res) {
-  // Temp GET test endpoint - remove after testing
-  if (req.method === "GET") {
-    const results = [];
-    for (const q of TESTS) {
-      const r = await client.messages.create({ model: "claude-haiku-4-5-20251001", max_tokens: 300, system: PROMPT, messages: [{ role: "user", content: q }] });
-      results.push({ q, a: r.content[0].text });
-    }
-    return res.status(200).json({ results });
-  }
-  if (req.method !== "POST") return res.status(405).end();
-  const sig = req.headers["x-line-signature"];
-  const body = JSON.stringify(req.body);
-  const hash = crypto.createHmac("sha256", SECRET).update(body).digest("base64");
-  if (hash !== sig) return res.status(401).end();
-  for (const event of req.body.events || []) {
-    if (event.type !== "message" || event.message.type !== "text") continue;
-    try {
-      const reply = await client.messages.create({ model: "claude-haiku-4-5-20251001", max_tokens: 800, system: PROMPT, messages: [{ role: "user", content: event.message.text }] });
-      const text = reply.content[0].text;
-      const lineRes = await fetch("https://api.line.me/v2/bot/message/reply", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${TOKEN}` }, body: JSON.stringify({ replyToken: event.replyToken, messages: [{ type: "text", text }] }) });
-      const lineData = await lineRes.json();
-      console.log("LINE:", lineRes.status, JSON.stringify(lineData));
-      if (LOGGER_URL) {
-        fetch(LOGGER_URL, { method: "POST", redirect: "follow", headers: { "Content-Type": "text/plain" }, body: JSON.stringify({ timestamp: (() => { const d = new Date(Date.now() + 8 * 60 * 60 * 1000); return d.toISOString().slice(0, 19).replace("T", " "); })(), userId: event.source?.userId || "unknown", userMessage: event.message.text, botReply: text }) }).then(r => console.log("LOGGER:", r.status)).catch(e => console.log("LOGGER_ERR:", e.message));
-      }
-    } catch (e) { console.error("Error:", e.message); }
-  }
-  res.status(200).json({ ok: true });
+if (req.method !== "POST") return res.status(405).end();
+const sig = req.headers["x-line-signature"];
+const body = JSON.stringify(req.body);
+const hash = crypto.createHmac("sha256", SECRET).update(body).digest("base64");
+if (hash !== sig) return res.status(401).end();
+for (const event of req.body.events || []) {
+if (event.type !== "message" || event.message.type !== "text") continue;
+try {
+const reply = await client.messages.create({ model: "claude-haiku-4-5-20251001", max_tokens: 800, system: PROMPT, messages: [{ role: "user", content: event.message.text }] });
+const text = reply.content[0].text;
+const lineRes = await fetch("https://api.line.me/v2/bot/message/reply", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${TOKEN}` }, body: JSON.stringify({ replyToken: event.replyToken, messages: [{ type: "text", text }] }) });
+const lineData = await lineRes.json();
+console.log("LINE:", lineRes.status, JSON.stringify(lineData));
+if (LOGGER_URL) {
+fetch(LOGGER_URL, { method: "POST", redirect: "follow", headers: { "Content-Type": "text/plain" }, body: JSON.stringify({ timestamp: (() => { const d = new Date(Date.now() + 8 * 60 * 60 * 1000); return d.toISOString().slice(0, 19).replace("T", " "); })(), userId: event.source?.userId || "unknown", userMessage: event.message.text, botReply: text }) }).then(r => console.log("LOGGER:", r.status)).catch(e => console.log("LOGGER_ERR:", e.message));
+}
+} catch (e) { console.error("Error:", e.message); }
+}
+res.status(200).json({ ok: true });
 }
