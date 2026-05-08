@@ -4,7 +4,7 @@ import crypto from "crypto";
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 const TOKEN = process.env.LINE_CHANNEL_ACCESS_TOKEN;
 const SECRET = process.env.LINE_CHANNEL_SECRET;
-const LOGGER_URL = process.env.LOGGER_URL;
+const LOGGER_URL = process.env.LOGGER_URL; // Google Apps Script 部署網址
 
 const PROMPT = `你是「舒敏小幫手」，是還道舒敏 LINE 官方帳號的 AI 客服助理，服務台灣用戶。請用溫暖親切的繁體中文（台灣用語）回覆，語氣像朋友聊天，適度使用 emoji（🌿📱✨😊）。回答要簡短精準，1-2句為主，不重複已知資訊。
 
@@ -55,6 +55,10 @@ Q:選單在哪裡? A:聊天室下方，點三條線或往上滑就能看到 📱
 Q:用了幾天但效果不明顯? A:效果因體質而異，建議繼續七天，也歡迎拍有手指的照片讓我們確認 🌿
 Q:可以推薦給朋友嗎? A:歡迎！直接分享這個帳號，完全免費 ✨
 Q:還道舒心要怎麼使用? A:搜尋「還道舒心」LINE 官方帳號，加入後點「開始調理」即可 🌿
+Q:我對食物過敏可以用嗎? A:食物過敏目前不在還道舒敏的研究範圍內 🌿 不過如果過敏同時引發鼻塞、打噴嚏、流鼻水等呼吸道不適，舒敏對這部分是有幫助的！歡迎試試看 ✨
+Q:許願/我想許願? A:哈哈雖然不是許願池 😄 但如果你的困擾跟呼吸道有關（鼻塞、流鼻水、打噴嚏），舒敏說不定就是你的小心願！完全免費試試看 🌿
+Q:可以開發新功能嗎/建議開發? A:謝謝你的建議！😊 你的想法對我們很有價值，都會認真參考 🌿 歡迎把具體建議寄到 contact-hsc@mingyifoundation.org，讓研究團隊看到 ✨
+Q:研究中什麼時候才能用/什麼時候推出? A:目前還在內部測試階段，還沒有確定的上線時間 🌿 有進展我們一定會在官方帳號公告，敬請期待 📱
 
 【無法回答時】引導聯絡：contact-hsc@mingyifoundation.org
 【絕對不做】醫療診斷、保證療效`;
@@ -88,7 +92,7 @@ method: "POST",
 redirect: "follow",
 headers: { "Content-Type": "text/plain" },
 body: JSON.stringify({
-timestamp: new Date().toLocaleString("zh-TW", { timeZone: "Asia/Taipei" }),
+timestamp: (() => { const d = new Date(Date.now() + 8 * 60 * 60 * 1000); return d.toISOString().slice(0, 19).replace("T", " "); })(),
 userId: event.source?.userId || "unknown",
 userMessage: event.message.text,
 botReply: text,
