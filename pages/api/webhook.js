@@ -4,6 +4,7 @@ import crypto from "crypto";
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 const TOKEN = process.env.LINE_CHANNEL_ACCESS_TOKEN;
 const SECRET = process.env.LINE_CHANNEL_SECRET;
+const LOGGER_URL = process.env.LOGGER_URL; // Google Apps Script 部署網址
 
 const PROMPT = `你是「舒敏小幫手」，是還道舒敏 LINE 官方帳號的 AI 客服助理，服務台灣用戶。請用溫暖親切的繁體中文（台灣用語）回覆，語氣像朋友聊天，適度使用 emoji（🌿📱✨😊）。回答要簡短精準，1-2句為主，不重複已知資訊。
 
@@ -81,6 +82,20 @@ body: JSON.stringify({ replyToken: event.replyToken, messages: [{ type: "text", 
 });
 const lineData = await lineRes.json();
 console.log("LINE:", lineRes.status, JSON.stringify(lineData));
+// 記錄對話到 Google Sheets（非同步，不影響回覆速度）
+if (LOGGER_URL) {
+fetch(LOGGER_URL, {
+method: "POST",
+redirect: "follow",
+headers: { "Content-Type": "text/plain" },
+body: JSON.stringify({
+timestamp: new Date().toISOString(),
+userId: event.source?.userId || "unknown",
+userMessage: event.message.text,
+botReply: text,
+}),
+}).then(r => console.log("LOGGER:", r.status)).catch(e => console.log("LOGGER_ERR:", e.message));
+}
 } catch (e) {
 console.error("Error:", e.message);
 }
