@@ -157,8 +157,8 @@ export default async function handler(req, res) {
       // 4. 滿意度回饋按鈕
       if (txt === "👍 有幫助" || txt === "👎 沒幫助") {
         const ack = txt === "👍 有幫助"
-          ? "謝謝你的回饋！有其他問題隨時歡迎再來問 🌿"
-          : "謝謝告訴我們！請問是哪個地方沒有解答到你的問題？可以再說說看，我來幫你 🌿";
+          ? "謝謝你！有其他問題隨時歡迎再來問 🌿"
+          : "謝謝你告訴我們，請問是哪個地方沒有解答到你？可以再說說看，我來幫你 🌿";
         await sendReply(event.replyToken, ack);
         logToSheet(uid, txt, "(回饋記錄)");
         continue;
