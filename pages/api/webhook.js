@@ -100,13 +100,6 @@ async function sendReply(replyToken, text, quickReply) {
 }
 
 export default async function handler(req, res) {
-  if (req.method === "GET") {
-    const lines = [
-      { input: "👍 有幫助", response: "謝謝你！有其他問題隨時歡迎再來問 🌿" },
-      { input: "👎 沒幫助", response: "謝謝你告訴我們，請問是哪個地方沒有解答到你？可以再說說看，我來幫你 🌿" }
-    ];
-    return res.status(200).json({ results: lines });
-  }
   if (req.method !== "POST") return res.status(405).end();
   
     const sig = req.headers["x-line-signature"];
