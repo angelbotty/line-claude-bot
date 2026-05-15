@@ -101,6 +101,21 @@ async function sendReply(replyToken, text, quickReply) {
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).end();
+  
+  // TEMP TEST ROUTE
+  if (req.method === "GET") {
+    const FEEDBACK_POSITIVE = "👍 有幫助";
+    const FEEDBACK_NEGATIVE = "👎 沒幫助";
+    const tests = [FEEDBACK_POSITIVE, FEEDBACK_NEGATIVE];
+    // Simulate ack text
+    const results = tests.map(txt => {
+      const ack = txt === FEEDBACK_POSITIVE
+        ? "謝謝你！有其他問題隨時歡迎再來問 🌿"
+        : "謝謝你告訴我們，請問是哪個地方沒有解答到你？可以再說說看，我來幫你 🌿";
+      return { input: txt, response: ack };
+    });
+    return res.status(200).json({ results });
+  }
   const sig = req.headers["x-line-signature"];
   const body = JSON.stringify(req.body);
   const hash = crypto.createHmac("sha256", SECRET).update(body).digest("base64");
