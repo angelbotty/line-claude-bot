@@ -132,8 +132,7 @@ export default async function handler(req, res) {
       // 1. Ask Shumi 打招呼
       if (txt === "Ask Shumi") {
         await sendReply(event.replyToken,
-          "你好！我是舒敏小幫手 🌿\n有任何關於還道舒敏的問題都歡迎問我，例如：怎麼使用、有沒有效、要不要付費……隨時都可以問！",
-          QR_SATISFACTION);
+          "你好！我是舒敏小幫手 🌿\n有任何關於還道舒敏的問題都歡迎問我，例如：怎麼使用、有沒有效、要不要付費……隨時都可以問！");
         logToSheet(uid, txt, "(打招呼)");
         continue;
       }
@@ -158,8 +157,8 @@ export default async function handler(req, res) {
       // 4. 滿意度回饋按鈕
       if (txt === "👍 有幫助" || txt === "👎 沒幫助") {
         const ack = txt === "👍 有幫助"
-          ? "謝謝你的回饋，很高興有幫到你！有其他問題隨時可以問 🌿"
-          : "謝謝告訴我們，我們會持續改善！還有問題歡迎繼續問，或寄信給 contact-hsc@mingyifoundation.org";
+          ? "謝謝你的回饋！有其他問題隨時歡迎再來問 🌿"
+          : "謝謝告訴我們！請問是哪個地方沒有解答到你的問題？可以再說說看，我來幫你 🌿";
         await sendReply(event.replyToken, ack);
         logToSheet(uid, txt, "(回饋記錄)");
         continue;
